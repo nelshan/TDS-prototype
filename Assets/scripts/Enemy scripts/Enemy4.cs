@@ -9,38 +9,51 @@ public class Enemy4 : MonoBehaviour
     [SerializeField] private float projectileSpeed = 5f; // Speed of the projectiles shot by Enemy4
     private Transform target;
 
-    public int damage;
-    public int health;
-    public float separationRadius = 0.5f; // Radius within which enemies will try to separate
-    public float separationForce = 0.5f; // Force with which enemies will push each other away
-    
-    public GameObject deathBooldEffect; // Death effect with animation and sound
-    // public GameObject scorePopUp;
+    [SerializeField] private int damage;
+    [SerializeField] private int health;
+    [SerializeField] private float separationRadius = 0.5f; // Radius within which enemies will try to separate
+    [SerializeField] private float separationForce = 0.5f; // Force with which enemies will push each other away
+
+    [SerializeField] private GameObject deathBooldEffect; // Death effect with animation and sound
 
     [SerializeField] private float attackRange = 5f; // Range within which enemy attacks
     [SerializeField] private float fireRate = 1f; // Time between attacks
     private float nextFireTime = 0f;
-    public GameObject projectilePrefab; // The projectile to be shot
-    public Transform projectileSpawnPosition; // The position from which projectiles are spawned
+    [SerializeField] private GameObject projectilePrefab; // The projectile to be shot
+    [SerializeField] private Transform projectileSpawnPosition; // The position from which projectiles are spawned
 
     [SerializeField] private int projectileCount = 8; // Number of projectiles to shoot in a circle
 
     private Animator animator;
+    private ItemDropManager itemDropManager; // Reference to the ItemDropManager
 
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponentInChildren<Animator>();
+        itemDropManager = GetComponent<ItemDropManager>(); // Initialize the item drop manager
     }
 
     private void Update()
     {
         if (health <= 0)
         {
-            HandleDeath();// Handle the death and effects
-            return;// Exit the Update method
+            HandleDeath(); // Handle the death and effects
+            return; // Exit the Update method
         }
 
+        MoveTowardsPlayer();
+
+        // Check if player is within attack range
+        if (Vector2.Distance(transform.position, target.position) <= attackRange && Time.time >= nextFireTime)
+        {
+            ShootProjectilesInCircle();
+            nextFireTime = Time.time + fireRate; // Set the next fire time
+        }
+    }
+
+    private void MoveTowardsPlayer()
+    {
         // Move towards the player
         Vector2 newPosition = Vector2.MoveTowards(transform.position, target.position, movementSpeed * Time.deltaTime);
 
@@ -57,13 +70,6 @@ public class Enemy4 : MonoBehaviour
 
         // Apply the final new position
         transform.position = newPosition;
-
-        // Check if player is within attack range
-        if (Vector2.Distance(transform.position, target.position) <= attackRange && Time.time >= nextFireTime)
-        {
-            ShootProjectilesInCircle();
-            nextFireTime = Time.time + fireRate; // Set the next fire time
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -71,21 +77,42 @@ public class Enemy4 : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // Apply damage to the player
-            other.GetComponent<player_controller>().TakeDam(damage);
+            player_controller player = other.GetComponent<player_controller>();
+            if (player != null)
+            {
+                player.TakeDam(damage);
+            }
+
+            CinemachineShake.Instance.ShakeCamera(5f, 0.1f); // Shake the VirtualCamera intensity and shakeTime
+            
+            // Play damage sound
+            AudioManager.Instance.PlaySFX("player damage sfx");
         }
-        else if (other.CompareTag("PlayerProjectile"))// Check for collision with projectile
+        else if (other.CompareTag("PlayerProjectile")) // Check for collision with projectile
         {
-            TakeDamage(other.GetComponent<Projectile>().damage);
+            Projectile projectile = other.GetComponent<Projectile>();
+            if (projectile != null)
+            {
+                TakeDamage(projectile.damage);
+            }
+        }
+        else if (other.CompareTag("PlayerexplosionProjectile")) // Check for collision with explosion projectile
+        {
+            ExplosionBullet2 explosionBullet = other.GetComponent<ExplosionBullet2>();
+            if (explosionBullet != null)
+            {
+                TakeDamage(explosionBullet.damage);
+            }
         }
     }
 
     public void TakeDamage(int damage)
     {
         health -= damage;
-        animator.SetTrigger("Damage");// Play enemy damage animation
+        animator.SetTrigger("Damage"); // Play enemy damage animation
         if (health <= 0)
         {
-            HandleDeath();// Handle the death and effects
+            HandleDeath(); // Handle the death and effects
         }
     }
 
@@ -95,14 +122,20 @@ public class Enemy4 : MonoBehaviour
         int randScoreBonus = Random.Range(100, 200);
         target.GetComponent<player_controller>().score += randScoreBonus;
         target.GetComponent<player_controller>().IncrementEnemiesDestroyed();
-        //Instantiate death effect
-        Instantiate(deathBooldEffect, transform.position, Quaternion.identity);
+
+        // Instantiate death effect
+        if (deathBooldEffect != null)
+        {
+            Instantiate(deathBooldEffect, transform.position, Quaternion.identity);
+        }
+
+        itemDropManager.TryDropItem(transform.position);
 
         // Destroy the enemy game object
         Destroy(gameObject);
     }
 
-     private void ShootProjectilesInCircle()
+    private void ShootProjectilesInCircle()
     {
         // Shoot projectiles in a circular pattern
         float angleStep = 360f / projectileCount;
@@ -120,7 +153,18 @@ public class Enemy4 : MonoBehaviour
             // Instantiate the projectile
             GameObject projectile = Instantiate(projectilePrefab, projectileSpawnPosition.position, Quaternion.identity);
             Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-            rb.velocity = projectileMoveDirection * projectileSpeed; // Set the projectile speed
+            if (rb != null)
+            {
+                rb.velocity = projectileMoveDirection * projectileSpeed; // Set the projectile speed
+            }
+
+            // Initialize the projectile
+            Enemy4Projectile enemy4Projectile = projectile.GetComponent<Enemy4Projectile>();
+            if (enemy4Projectile != null)
+            {
+                enemy4Projectile.Initialize();
+            }
+
             angle += angleStep;
         }
     }

@@ -1,37 +1,46 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy5 : MonoBehaviour
 {
     [SerializeField] private float speed;
     private Vector2 targetLocation;
 
-    public int damage;
-    public int health;
-    public float separationRadius = 0.5f; // Radius within which enemies will try to separate
-    public float separationForce = 0.5f; // Force with which enemies will push each other away
-    public GameObject deathBloodEffect; // Death effect with particle effect and sound
-    public GameObject spawnObject; // Object to spawn after reaching the location
+    [SerializeField] private int damage;
+    [SerializeField] private int health;
+
+    [SerializeField] private float separationRadius = 0.5f; // Radius within which enemies will try to separate
+    [SerializeField] private float separationForce = 0.5f; // Force with which enemies will push each other away
+
+    [SerializeField] private GameObject deathEffect; // Death effect with particle effect and sound
+
+    [SerializeField] private GameObject spawnObject; // Object to spawn after reaching the location
+
     private Animator animator;
 
     // Range settings for random position around player
-    public float minDistance = 2f;
-    public float maxDistance = 5f;
+    [SerializeField] private float minDistance = 2f;
+    [SerializeField] private float maxDistance = 5f;
     private bool hasReachedTargetLocation = false; // Flag to check if the target location is reached
     private bool isSpawning = false; // Flag to ensure spawning coroutine runs only once
 
-    public float fallbackDuration = 0.5f; // Duration of the knockback effect
-    public float attackCooldown = 1f; // Cooldown time between attacks
+    [SerializeField] private float fallbackDuration = 0.5f; // Duration of the knockback effect
+    [SerializeField] private float attackCooldown = 1f; // Cooldown time between attacks
     private float nextAttackTime; // Time when the enemy can attack again
-    public float attackRange = 3f; // Range within which the enemy will charge towards the player
+    [SerializeField] private float attackRange = 3f; // Range within which the enemy will charge towards the player
 
-    public float chargeForce = 10f; // Force applied when charging towards the player
-    public float fallbackForce = 5f; // Force applied when falling back
+    [SerializeField] private float chargeForce = 10f; // Force applied when charging towards the player
+    [SerializeField] private float fallbackForce = 5f; // Force applied when falling back
 
     private Rigidbody2D rb;
     private bool isCharging = false; // Flag to check if the enemy is charging
     private Vector2 initialPosition; // To store the initial position before charge
+
+    private int totalSpawnedObjects = 0; // Counter for total spawned objects
+    private int maxSpawnObjects = 30; // Maximum number of objects that can be spawned
+
+    private ItemDropManager itemDropManager; // Reference to the ItemDropManager
+
 
     private void Start()
     {
@@ -39,6 +48,7 @@ public class Enemy5 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>(); // Get the Rigidbody2D component
         SetRandomTargetLocation();
         nextAttackTime = Time.time; // Initialize the next attack time
+        itemDropManager = GetComponent<ItemDropManager>(); // Initialize the item drop manager
     }
 
     private void Update()
@@ -130,6 +140,10 @@ public class Enemy5 : MonoBehaviour
         if (Vector2.Distance(transform.position, playerPosition) <= 0.5f) // Adjust the distance threshold as needed
         {
             playerTransform.GetComponent<player_controller>().TakeDam(damage);
+
+            CinemachineShake.Instance.ShakeCamera(5f, 0.1f); //shake the VirtualCamera intensity and shakeTime
+
+            AudioManager.Instance.PlaySFX("player damage sfx"); // Play damage sound
         }
 
         // Fall back to the initial position
@@ -158,14 +172,21 @@ public class Enemy5 : MonoBehaviour
 
             while (true)
             {
-                // Trigger the spawn animation
-                animator.SetTrigger("SpawnObject");
+                if (totalSpawnedObjects < maxSpawnObjects)
+                {
+                    // Trigger the spawn animation
+                    animator.SetTrigger("SpawnObject");
 
-                // Wait for the animation to finish
-                yield return new WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("enemy1spawnObject") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f);
+                    // Wait for the animation to finish
+                    yield return new WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("enemy1spawnObject") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f);
 
-                // Instantiate the spawn object
-                Instantiate(spawnObject, transform.position, Quaternion.identity);
+                    // Instantiate the spawn object
+                    GameObject spawnedObject = Instantiate(spawnObject, transform.position, Quaternion.identity);
+                    spawnedObject.GetComponent<Enemy5SpawnedObjectcounter>().OnDestroyed += HandleSpawnedObjectDestroyed; // Subscribe to the OnDestroyed event
+
+                    // Increment the total spawned objects count
+                    totalSpawnedObjects++;
+                }
 
                 // Wait for 5 seconds before the next spawn
                 yield return new WaitForSeconds(5f);
@@ -173,11 +194,20 @@ public class Enemy5 : MonoBehaviour
         }
     }
 
+    private void HandleSpawnedObjectDestroyed()
+    {
+        totalSpawnedObjects--;
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("PlayerProjectile")) // Check for collision with projectile
         {
             TakeDamage(other.GetComponent<Projectile>().damage);
+        }
+        else if (other.CompareTag("PlayerexplosionProjectile")) // Check for collision with explosionprojectile
+        {
+            TakeDamage(other.GetComponent<ExplosionBullet2>().damage);
         }
     }
 
@@ -200,7 +230,13 @@ public class Enemy5 : MonoBehaviour
         playerTransform.GetComponent<player_controller>().IncrementEnemiesDestroyed();
 
         // Instantiate death effect
-        Instantiate(deathBloodEffect, transform.position, Quaternion.identity);
+        Instantiate(deathEffect, transform.position, Quaternion.identity);
+
+        // Try dropping an item
+        if (itemDropManager != null)
+        {
+            itemDropManager.TryDropItem(transform.position);
+        }
 
         // Destroy the enemy game object
         Destroy(gameObject);

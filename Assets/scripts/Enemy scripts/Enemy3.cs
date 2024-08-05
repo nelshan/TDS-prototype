@@ -6,29 +6,34 @@ public class Enemy3 : MonoBehaviour
     [SerializeField] private float speed;
     private Transform target;
 
-    public int damage;
-    public int health;
-    public float separationRadius = 0.5f; // Radius within which enemies will try to separate
-    public float separationForce = 0.5f; // Force with which enemies will push each other away
+    [SerializeField] private int damage;
+    [SerializeField] private int health;
+    [SerializeField] private float separationRadius = 0.5f; // Radius within which enemies will try to separate
+    [SerializeField] private float separationForce = 0.5f; // Force with which enemies will push each other away
 
     private Animator animator;
 
     [SerializeField] private float attackRange = 5f; // Range within which the enemy starts the laser attack
     [SerializeField] private float attackCooldown = 3f; // Time between attacks
     private bool isAttacking;
-    public Transform laserSpawnPosition; // Variable for laser attack spawn position
-    public GameObject laserAnchorPrefab; // Prefab for the laser attack anchor point
+    [SerializeField] private Transform laserSpawnPosition; // Variable for laser attack spawn position
+    [SerializeField] private GameObject laserAtkPrefab; // Prefab for the laser attack anchor point
     [SerializeField] private int minLaserDamage = 10; // Minimum laser damage
     [SerializeField] private int maxLaserDamage = 20; // Maximum laser damage
     [SerializeField] private GameObject laserIndicatedWarning; // Warning sprite GameObject
     [SerializeField] private float laserWarningTime = 2f; // Duration for laser warning
 
-    public GameObject deathBooldEffect; // Death effect with partical effect and sound
+    [SerializeField] private GameObject deathBooldEffect; // Death effect with particle effect and sound
+
+    private ItemDropManager itemDropManager; // Reference to the ItemDropManager
+
+
 
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponentInChildren<Animator>();
+        itemDropManager = GetComponent<ItemDropManager>(); // Initialize the item drop manager
     }
 
     private void Update()
@@ -40,7 +45,6 @@ public class Enemy3 : MonoBehaviour
         }
 
         float distanceToPlayer = Vector2.Distance(transform.position, target.position);
-
         if (distanceToPlayer <= attackRange && !isAttacking)
         {
             StartCoroutine(StartLaserAttack());
@@ -65,6 +69,7 @@ public class Enemy3 : MonoBehaviour
                 newPosition += separationDirection * separationForce * Time.deltaTime;
             }
         }
+
         // Apply the final new position
         transform.position = newPosition;
     }
@@ -80,6 +85,9 @@ public class Enemy3 : MonoBehaviour
         laserIndicatedWarning.transform.rotation = Quaternion.Euler(0, 0, angle);
         laserIndicatedWarning.SetActive(true);
 
+        // Play the laser warning sound
+        AudioManager.Instance.PlaySFX("Enemy3 laserIndicatedWarning sfx");
+
         SpriteRenderer warningSpriteRenderer = laserIndicatedWarning.GetComponentInChildren<SpriteRenderer>();
         StartCoroutine(FadeWarningSprite(warningSpriteRenderer));
 
@@ -90,8 +98,13 @@ public class Enemy3 : MonoBehaviour
 
         // Start the laser attack
         int laserDamage = Random.Range(minLaserDamage, maxLaserDamage);
-        GameObject laserAnchorInstance = Instantiate(laserAnchorPrefab, laserSpawnPosition.position, Quaternion.Euler(0, 0, angle));
+        GameObject laserAnchorInstance = Instantiate(laserAtkPrefab, laserSpawnPosition.position, Quaternion.Euler(0, 0, angle));
         laserAnchorInstance.GetComponent<LaserAttack>().Initialize(laserDamage, target);
+
+        // Play the laser attack sound
+        AudioManager.Instance.PlaySFX("Enemy3 laserAtk sfx");
+        
+        CinemachineShake.Instance.ShakeCamera(5f, 0.1f); // Shake the VirtualCamera with intensity and shakeTime
 
         yield return new WaitForSeconds(attackCooldown); // Cooldown before next attack
         isAttacking = false;
@@ -130,10 +143,19 @@ public class Enemy3 : MonoBehaviour
         {
             // Apply damage to the player
             other.GetComponent<player_controller>().TakeDam(damage);
+            
+            CinemachineShake.Instance.ShakeCamera(5f, 0.1f); // Shake the VirtualCamera with intensity and shakeTime
+
+            // Play the collision sound
+            AudioManager.Instance.PlaySFX("player damage sfx");
         }
         else if (other.CompareTag("PlayerProjectile")) // Check for collision with projectile
         {
             TakeDamage(other.GetComponent<Projectile>().damage);
+        }
+        else if (other.CompareTag("PlayerexplosionProjectile")) // Check for collision with explosionprojectile
+        {
+            TakeDamage(other.GetComponent<ExplosionBullet2>().damage);
         }
     }
 
@@ -157,6 +179,8 @@ public class Enemy3 : MonoBehaviour
         // Instantiate death effect
         Instantiate(deathBooldEffect, transform.position, Quaternion.identity);
 
+        itemDropManager.TryDropItem(transform.position);
+ 
         // Destroy the enemy game object
         Destroy(gameObject);
     }

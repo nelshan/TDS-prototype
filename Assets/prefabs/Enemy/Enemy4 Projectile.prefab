@@ -194,4 +194,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 4
-  fireballExplosionPrefab: {fileID: 3199022207735139386, guid: aed4e86530479fa40a10a48c67f04010, type: 3}
+  ParticleSystemPrefab: {fileID: 5477504961774841636, guid: 8f7a4b1b357b9974aac2d9142ff5f8e4, type: 3}

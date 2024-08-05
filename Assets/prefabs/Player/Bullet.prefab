@@ -101,7 +101,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 100
   damage: 1
-  sound: {fileID: 2585091786537304829, guid: fdb791c5c864c3642aededee21db5a27, type: 3}
 --- !u!114 &7103288236142527346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,7 +143,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

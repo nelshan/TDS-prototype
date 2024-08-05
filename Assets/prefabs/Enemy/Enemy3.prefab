@@ -212,6 +212,7 @@ GameObject:
   - component: {fileID: 1018931926820361018}
   - component: {fileID: 3098322234068602298}
   - component: {fileID: 1198272889866856629}
+  - component: {fileID: 2118731325156508542}
   m_Layer: 7
   m_Name: Enemy3
   m_TagString: Enemy
@@ -324,17 +325,36 @@ MonoBehaviour:
   speed: 3
   damage: 3
   health: 15
-  separationRadius: 0.5
-  separationForce: 0.5
+  separationRadius: 5
+  separationForce: 5
   attackRange: 6.66
   attackCooldown: 2
   laserSpawnPosition: {fileID: 3397944721519400960}
-  laserAnchorPrefab: {fileID: 3760291355981769093, guid: 1b1b977b2abf590418c4324aa67835f4, type: 3}
+  laserAtkPrefab: {fileID: 3760291355981769093, guid: 1b1b977b2abf590418c4324aa67835f4, type: 3}
   minLaserDamage: 2
   maxLaserDamage: 5
   laserIndicatedWarning: {fileID: 388561601575731214}
   laserWarningTime: 1
   deathBooldEffect: {fileID: 5429169109122593495, guid: 092e9707d9958874eaaae8be11bc7210, type: 3}
+--- !u!114 &2118731325156508542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6703786847098283194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51540f708cc2ac246bb483f7ace467ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healItemPrefab: {fileID: 529486298729777491, guid: c59cdf81275489e4da468f02fda961d0, type: 3}
+  weapon1Prefab: {fileID: 6782888464425852092, guid: ee4fd3d62af50a442ba58db1f585173e, type: 3}
+  weapon2Prefab: {fileID: 8422753023138558564, guid: eb00317537a8e15479f0cd465f301f2e, type: 3}
+  weapon3Prefab: {fileID: 4131756535107656711, guid: 84f0f7dae357305488593518d817bac1, type: 3}
+  dropChance: 0.1
+  healDropChance: 0.3
+  weaponDropChance: 0.2
 --- !u!1 &7624029162905242111
 GameObject:
   m_ObjectHideFlags: 0

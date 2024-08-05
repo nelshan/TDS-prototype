@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 2504040175235994896}
   - component: {fileID: 2087349610986082798}
   - component: {fileID: 6312303112368314058}
-  - component: {fileID: 3859639597492021758}
   - component: {fileID: 2548900755491395895}
+  - component: {fileID: 3859639597492021758}
   m_Layer: 0
   m_Name: Enemy2Projectile
   m_TagString: Untagged
@@ -116,26 +116,12 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &3859639597492021758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3526885122200441893}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58c921897eb20ba4d91f96a6d670a79a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 4
-  lifespan: 5
 --- !u!50 &2548900755491395895
 Rigidbody2D:
   serializedVersion: 4
@@ -163,3 +149,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &3859639597492021758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3526885122200441893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c921897eb20ba4d91f96a6d670a79a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 6
+  lifespan: 5

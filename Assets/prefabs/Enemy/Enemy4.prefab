@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 3312119835866203785}
   - component: {fileID: 7232855083905775747}
   - component: {fileID: 381890304249192700}
+  - component: {fileID: 7802712422681440003}
   m_Layer: 7
   m_Name: Enemy4
   m_TagString: Enemy
@@ -208,14 +209,35 @@ MonoBehaviour:
   projectileSpeed: 5
   damage: 3
   health: 15
-  separationRadius: 0.5
-  separationForce: 0.5
+  separationRadius: 5
+  separationForce: 5
   deathBooldEffect: {fileID: 5429169109122593495, guid: 092e9707d9958874eaaae8be11bc7210, type: 3}
   attackRange: 18.36
-  fireRate: 5
+  fireRate: 4
   projectilePrefab: {fileID: 3903947455182754058, guid: 67a98cad05c40e3438286ee5253745ab, type: 3}
   projectileSpawnPosition: {fileID: 2240579800530923485}
   projectileCount: 10
+--- !u!114 &7802712422681440003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3268803174601981979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51540f708cc2ac246bb483f7ace467ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healItemPrefab: {fileID: 529486298729777491, guid: c59cdf81275489e4da468f02fda961d0, type: 3}
+  weapon1Prefab: {fileID: 6782888464425852092, guid: ee4fd3d62af50a442ba58db1f585173e, type: 3}
+  weapon2Prefab: {fileID: 8422753023138558564, guid: eb00317537a8e15479f0cd465f301f2e, type: 3}
+  weapon3Prefab: {fileID: 4131756535107656711, guid: 84f0f7dae357305488593518d817bac1, type: 3}
+  dropChance: 0.1
+  healDropChance: 0.3
+  weapon1DropChance: 0.2
+  weapon2DropChance: 0.2
+  weapon3DropChance: 0.2
 --- !u!1 &3945123136745502851
 GameObject:
   m_ObjectHideFlags: 0

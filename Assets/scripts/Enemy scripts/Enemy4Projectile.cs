@@ -1,38 +1,60 @@
 using UnityEngine;
+using System.Collections;
 
 public class Enemy4Projectile : MonoBehaviour
 {
-    public int damage; // Damage dealt by the projectile
-    public GameObject fireballExplosionPrefab; // Prefab for the fireball explosion
+    [SerializeField] private int damage = 10; // Default damage dealt by the projectile
+    [SerializeField] private float lifespan = 5f; // Time in seconds before the projectile is destroyed
+    private float creationTime;
+    [SerializeField] private GameObject ParticleSystemPrefab; // Prefab for the fireball explosion
+
+    public void Initialize()
+    {
+        creationTime = Time.time; // Record the creation time
+    }
+
+    private void Update()
+    {
+        // Destroy the projectile after the lifespan expires
+        if (Time.time >= creationTime + lifespan)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            // Apply damage to the player
-            other.GetComponent<player_controller>().TakeDam(damage);
-            // Create the explosion effect
-            CreateExplosion();
-            // Destroy the projectile upon hitting the player
+            player_controller player = other.GetComponent<player_controller>();
+            if (player != null)
+            {
+                player.TakeDam(damage);
+            }
+
+            // Instantiate the explosion at the projectile's position
+            if (ParticleSystemPrefab != null)
+            {
+                Instantiate(ParticleSystemPrefab, transform.position, Quaternion.identity);
+            }
+
+            CinemachineShake.Instance.ShakeCamera(5f, 0.1f); // Shake the VirtualCamera intensity and shakeTime
+
+            // Play the hit sound
+            AudioManager.Instance.PlaySFX("player damage sfx");
+
             Destroy(gameObject);
         }
-        else if (other.CompareTag("Obstacle")) // Optional: Destroy the projectile if it hits an obstacle
+        else if (other.CompareTag("Obstacle"))
         {
-            // Create the explosion effect
-            CreateExplosion();
+            // Instantiate the explosion at the projectile's position
+            if (ParticleSystemPrefab != null)
+            {
+                Instantiate(ParticleSystemPrefab, transform.position, Quaternion.identity);
+            }
+
             // Destroy the projectile upon hitting the obstacle
             Destroy(gameObject);
         }
-    }
-
-    private void CreateExplosion()
-    {
-        // Instantiate the explosion at the projectile's position
-        GameObject explosion = Instantiate(fireballExplosionPrefab, transform.position, Quaternion.identity);
-
-        // Optional: Destroy the explosion after the animation completes
-        Animator explosionAnimator = explosion.GetComponent<Animator>();
-        float explosionDuration = explosionAnimator.GetCurrentAnimatorStateInfo(0).length;
-        Destroy(explosion, explosionDuration);
     }
 }

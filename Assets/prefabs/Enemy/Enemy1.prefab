@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 680700980655229517}
   - component: {fileID: 6529833768788296442}
   - component: {fileID: 5565596912751998575}
+  - component: {fileID: 7816275454337765583}
   - component: {fileID: 370118427243656688}
   m_Layer: 7
   m_Name: Enemy1
@@ -173,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eefb83882f0c2da47bfed1ee5dfcf5e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
+  Movementspeed: 3
   damage: 1
   health: 10
   separationRadius: 0.5
@@ -182,6 +183,27 @@ MonoBehaviour:
   FallbackDistance: 1
   FallbackDuration: 0.5
   attackCooldown: 1
+--- !u!114 &7816275454337765583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7007238566901674098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51540f708cc2ac246bb483f7ace467ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healItemPrefab: {fileID: 529486298729777491, guid: c59cdf81275489e4da468f02fda961d0, type: 3}
+  weapon1Prefab: {fileID: 6782888464425852092, guid: ee4fd3d62af50a442ba58db1f585173e, type: 3}
+  weapon2Prefab: {fileID: 8422753023138558564, guid: eb00317537a8e15479f0cd465f301f2e, type: 3}
+  weapon3Prefab: {fileID: 4131756535107656711, guid: 84f0f7dae357305488593518d817bac1, type: 3}
+  dropChance: 0.1
+  healDropChance: 0.3
+  weapon1DropChance: 0.2
+  weapon2DropChance: 0.2
+  weapon3DropChance: 0.2
 --- !u!95 &370118427243656688
 Animator:
   serializedVersion: 5
