@@ -1,4 +1,4 @@
-Developed "BOXY," an endless 2D top-down shooter where players must survive against waves of enemies and mini-bosses using a variety of weapons. The game features dynamic gameplay with progressively challenging enemy waves and boss encounters. Implemented using Unity Engine, Blender, and various assets and tools to create a seamless and engaging experience.(STILL INDEVELOPMENT)
+Developed "BOXY," an endless 2D top-down shooter where players must survive against waves of enemies and mini-bosses using a variety of weapons. The game features dynamic gameplay with progressively challenging enemy waves and boss encounters. Implemented using Unity Engine, Blender, and various assets and tools to create a seamless and engaging experience. (STILL IN DEVELOPMENT)
 
 > Gameplay Mechanics: Designed and implemented core gameplay mechanics, including player movement, shooting, and enemy interactions.
 
